@@ -53,6 +53,7 @@ view(sep_new)
 a) Make a table using **gt** which shows the five courses with the biggest increase. Use the [How to make a table](https://davidkane9.github.io/PPBDS/tools.html#how-to-make-a-table) section of *The Primer*.
 
 ```{r}
+
 top_five_inc <- inner_join(sep_old, sep_new, by = "id", suffix = 
                              c("_old", "_new")) %>%
   mutate(enrollment_change = u_grad_new - u_grad_old) %>%
@@ -60,15 +61,62 @@ top_five_inc <- inner_join(sep_old, sep_new, by = "id", suffix =
   select(name_new, department_new, enrollment_change) %>%
 head(5) %>%
   gt() %>%
-  tab_header(title = "Top 5 Classes with Highest Enrollment Increases")
+  tab_header(title = "Top 5 Classes with Highest Enrollment Increases") %>%
+  cols_label(name_new = "Name",
+             department_new = "Department",
+             enrollment_change = "Change") 
 top_five_inc
 
+```
+
+```{r}
+
+top_five_dec <- inner_join(sep_old, sep_new, by = "id", suffix = 
+                             c("_old", "_new")) %>%
+  mutate(enrollment_change = u_grad_new - u_grad_old) %>%
+  arrange((enrollment_change)) %>%
+  select(name_new, department_new, enrollment_change) %>%
+head(5) %>%
+  gt() %>%
+  tab_header(title = "Top 5 Classes with Highest Enrollment Decreases") %>%
+  cols_label(name_new = "Name",
+             department_new = "Department",
+             enrollment_change = "Change") 
+top_five_dec
 ```
 
 
 b) Make a table using **gt** which shows the five courses with the biggest decrease.
 
 c) Make a nice looking graphic which shows these 10 courses.
+
+```{r}
+
+top_five_inc <- inner_join(sep_old, sep_new, by = "id", suffix = 
+                             c("_old", "_new")) %>%
+  mutate(enrollment_change = u_grad_new - u_grad_old) %>%
+  arrange(desc(enrollment_change)) %>%
+  select(name_new, department_new, enrollment_change) %>%
+head(5) 
+
+top_five_dec <- inner_join(sep_old, sep_new, by = "id", suffix = 
+                             c("_old", "_new")) %>%
+  mutate(enrollment_change = u_grad_new - u_grad_old) %>%
+  arrange((enrollment_change)) %>%
+  select(name_new, department_new, enrollment_change) %>%
+head(5)
+
+full_join(top_five_inc, top_five_dec, by = c("enrollment_change", 
+                     "name_new", "department_new")) %>%
+  arrange(enrollment_change) %>%
+  mutate(name_new = reorder(name_new, enrollment_change)) %>%
+  ggplot(aes(x = name_new, y = enrollment_change, fill = department_new)) + 
+  geom_col() +
+  coord_flip()
+
+```
+
+
 
 d) Write down some thoughts about what might explain these increases and decreases. Or is it all just random? How would we know?
 
