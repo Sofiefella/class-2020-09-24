@@ -42,6 +42,8 @@ sep_new <-
   group_by(id, title, name, department) %>% 
   summarize(u_grad = sum(u_grad), .groups = "drop") %>% 
   filter(u_grad > 10)
+
+view(sep_new)
 ```
 
 ### Scene 1
@@ -49,6 +51,20 @@ sep_new <-
 **Prompt:** Which classes had the biggest increases and decreases in undergraduate enrollments between September 1 and September 22? Obviously, you will need to join the two datasets which I have created for you above.
 
 a) Make a table using **gt** which shows the five courses with the biggest increase. Use the [How to make a table](https://davidkane9.github.io/PPBDS/tools.html#how-to-make-a-table) section of *The Primer*.
+
+```{r}
+top_five_inc <- inner_join(sep_old, sep_new, by = "id", suffix = 
+                             c("_old", "_new")) %>%
+  mutate(enrollment_change = u_grad_new - u_grad_old) %>%
+  arrange(desc(enrollment_change)) %>%
+  select(name_new, department_new, enrollment_change) %>%
+head(5) %>%
+  gt() %>%
+  tab_header(title = "Top 5 Classes with Highest Enrollment Increases")
+top_five_inc
+
+```
+
 
 b) Make a table using **gt** which shows the five courses with the biggest decrease.
 
